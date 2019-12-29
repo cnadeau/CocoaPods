@@ -37,6 +37,7 @@ module Pod
             ['--swift-version=VERSION', 'The `SWIFT_VERSION` that should be used when linting the spec. ' \
              'This takes precedence over the Swift versions specified by the spec or a `.swift-version` file'],
             ['--no-overwrite', 'Disallow pushing that would overwrite an existing spec'],
+            ['--beehivr-no-verify', 'Beehivr: do not verify the pod before pushing it to the repo (speeds up as it pushes almost instantly)'],
           ].concat(super)
         end
 
@@ -57,6 +58,7 @@ module Pod
           @skip_import_validation = argv.flag?('skip-import-validation', false)
           @skip_tests = argv.flag?('skip-tests', false)
           @allow_overwrite = argv.flag?('overwrite', true)
+          @beehivr_no_verify = argv.flag?('beehivr-no-verify', false)
           super
         end
 
@@ -73,7 +75,7 @@ module Pod
         def run
           open_editor if @commit_message && @message.nil?
           check_if_push_allowed
-          validate_podspec_files
+          validate_podspec_files if !@beehivr_no_verify
           check_repo_status
           update_repo
           add_specs_to_repo
